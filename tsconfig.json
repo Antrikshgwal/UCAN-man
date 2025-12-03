@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"module": "Node16",
+		"target": "ES2022",
+		"lib": [
+			"ES2022"
+		],
+		"sourceMap": true,
+		"rootDir": "src",
+		"strict": true,
+		"moduleResolution": "node16",
+		"isolatedModules": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"outDir": "out"
+	},
+	"include": [
+		"src/extension/**/*.ts",
+		"src/shared/**/*.ts"
+, "src/shared/ucan.ts", "src/extension/main.ts"	]
+}
