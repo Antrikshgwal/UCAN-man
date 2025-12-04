@@ -11,7 +11,9 @@
     "Other"
   ],
   "allowImportingTsExtensions": true,
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:ucanman.openInspector"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -52,6 +54,7 @@
     "@ipld/car": "^5.4.2",
     "@ucanto/core": "^10.4.6",
     "@ucanto/interface": "^11.0.1",
+    "cborg": "^4.3.1",
     "multiformats": "^13.4.1",
     "uint8arrays": "^5.1.0"
   }

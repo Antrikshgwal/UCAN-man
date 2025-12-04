@@ -17,6 +17,9 @@ importers:
       '@ucanto/interface':
         specifier: ^11.0.1
         version: 11.0.1
+      cborg:
+        specifier: ^4.3.1
+        version: 4.3.1
       multiformats:
         specifier: ^13.4.1
         version: 13.4.1
