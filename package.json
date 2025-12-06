@@ -11,9 +11,7 @@
     "Other"
   ],
   "allowImportingTsExtensions": true,
-  "activationEvents": [
-    "onCommand:ucanman.openInspector"
-  ],
+  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -35,7 +33,7 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vscode-test",
-    "build": "node esbuild.config.js",
+    "build": "node esbuild.config.js && tsc",
     "watch": "node esbuild.config.js --watch"
   },
   "devDependencies": {

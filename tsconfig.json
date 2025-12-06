@@ -17,5 +17,5 @@
 	"include": [
 		"src/extension/**/*.ts",
 		"src/shared/**/*.ts"
-, "src/shared/ucan.ts", "src/extension/main.ts"	]
+, "src/shared/types.ts", "src/extension/main.ts"	]
 }

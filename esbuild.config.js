@@ -1,23 +1,10 @@
-import esbuild from 'esbuild';
+import esbuild from "esbuild";
 
-const isWatch = process.argv.includes("--watch");
-
-const options = {
-  entryPoints: ['src/extension/main.ts'],
+esbuild.build({
+  entryPoints: ["src/webview/app.ts"],
   bundle: true,
-  outfile: 'out/extension.js',
-  platform: 'node',
-  format: 'esm',
-  external: ['vscode'],
+  outfile: "dist/webview.js",
+  platform: "browser",
+  format: "iife",
   sourcemap: true,
-};
-
-if (isWatch) {
-  // New API: use context() + watch()
-  esbuild.context(options).then(ctx => {
-    ctx.watch();
-    console.log("Watching for changes...");
-  });
-} else {
-  esbuild.build(options).catch(() => process.exit(1));
-}
+}).catch(() => process.exit(1));
