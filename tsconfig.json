@@ -2,20 +2,22 @@
 	"compilerOptions": {
 		"module": "Node16",
 		"target": "ES2022",
+		"outDir": "out",
 		"lib": [
-			"ES2022"
+			"DOM"
 		],
 		"sourceMap": true,
 		"rootDir": "src",
 		"strict": true,
-		"moduleResolution": "node16",
-		"isolatedModules": true,
-		"esModuleInterop": true,
+		"moduleResolution": "Node16",
 		"skipLibCheck": true,
-		"outDir": "out"
+		"esModuleInterop": true
 	},
 	"include": [
-		"src/extension/**/*.ts",
-		"src/shared/**/*.ts"
-, "src/shared/types.ts", "src/extension/main.ts"	]
+		"src"
+	],
+	"exclude": [
+		"node_modules",
+		".vscode-test"
+	]
 }

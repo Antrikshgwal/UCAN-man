@@ -2,7 +2,6 @@
   "name": "ucan-man",
   "displayName": "UCAN-man",
   "description": "VS code extension for debugging UCAN requests",
-  "type": "module",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.80.0"
@@ -11,13 +10,12 @@
     "Other"
   ],
   "allowImportingTsExtensions": true,
-  "activationEvents": [],
-  "main": "./out/extension.js",
+  "main": "./out/extension.cjs",
   "contributes": {
     "commands": [
       {
-        "command": "ucanman.openInspector",
-        "title": "UCANman: Open Inspector"
+        "title": "UCANman: Open Inspector",
+        "command": "ucanman.decodeUcan"
       }
     ]
   },

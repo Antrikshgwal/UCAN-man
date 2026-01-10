@@ -1,8 +1,11 @@
-const vscode = acquireVsCodeApi();
+interface VsCodeApi {
+  postMessage(message: any): void;
+}
+declare function acquireVsCodeApi(): VsCodeApi;
 
 const input = document.getElementById("input") as HTMLTextAreaElement;
 const output = document.getElementById("output") as HTMLElement;
-
+const vscode = acquireVsCodeApi();
 document.getElementById("decode")!.addEventListener("click", () => {
   vscode.postMessage({
     type: "decode",
