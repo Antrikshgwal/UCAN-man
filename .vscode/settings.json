@@ -9,5 +9,13 @@
         "dist": true // set this to false to include "dist" folder in search results
     },
     // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-    "typescript.tsc.autoDetect": "off"
+    "typescript.tsc.autoDetect": "off",
+    "simpleCodingTimeTracker.inactivityTimeout": 2.5,
+    "simpleCodingTimeTracker.focusTimeout": 3,
+    "simpleCodingTimeTracker.statusBar.showSeconds": false,
+    "simpleCodingTimeTracker.health.enableNotifications": true,
+    "simpleCodingTimeTracker.health.modalNotifications": true,
+    "simpleCodingTimeTracker.health.eyeRestInterval": 20,
+    "simpleCodingTimeTracker.health.stretchInterval": 30,
+    "simpleCodingTimeTracker.health.breakThreshold": 90
 }

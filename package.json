@@ -10,12 +10,16 @@
     "Other"
   ],
   "allowImportingTsExtensions": true,
-  "main": "./out/extension.cjs",
+  "main": "./out/main.cjs",
   "contributes": {
     "commands": [
       {
         "title": "UCANman: Open Inspector",
         "command": "ucanman.decodeUcan"
+      },
+      {
+        "title": "UCANman: Export to JSON",
+        "command": "ucanman.exportToJson"
       }
     ]
   },
