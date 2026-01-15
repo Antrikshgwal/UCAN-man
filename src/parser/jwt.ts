@@ -1,4 +1,4 @@
-import { base64urlToJson } from "./utils.js";
+import { base64urlToJson } from "./parser.js";
 
 export function decodeJWT(ucan: string) {
   const parts = ucan.split(".");

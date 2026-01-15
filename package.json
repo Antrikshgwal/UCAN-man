@@ -9,6 +9,7 @@
   "categories": [
     "Other"
   ],
+  "type": "module",
   "allowImportingTsExtensions": true,
   "main": "./out/main.cjs",
   "contributes": {
@@ -51,6 +52,7 @@
     "typescript-eslint": "^8.46.3"
   },
   "dependencies": {
+    "@ipld/block": "^6.0.4",
     "@ipld/car": "^5.4.2",
     "@ucanto/core": "^10.4.6",
     "@ucanto/interface": "^11.0.1",
