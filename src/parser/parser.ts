@@ -1,8 +1,9 @@
 import { base64url } from "multiformats/bases/base64";
 import { CarReader } from "@ipld/car";
-import Block from "@ipld/block/defaults"; // Deprecated, use multiformats
+import { decode } from "multiformats/block"; // Deprecated, use multiformats
 import * as CBOR from "@ipld/dag-cbor";
-import { decodeDID } from "../shared/utils.js";
+import { CID } from "multiformats/cid";
+import { decodeDID } from "../shared/utils.ts";
 
 export function base64urlToJson(b64: string): any {
   const base64 = b64.replace(/-/g, "+").replace(/_/g, "/");
@@ -15,27 +16,85 @@ export function base64urlToJson(b64: string): any {
  */
 
 /**
- * Decode email UCAN string into Delegation
+ * Recursively process values to convert CIDs and Uint8Arrays to readable formats
  */
-async function decodeEmailUCAN(ucanString) {
-  // Decode base64url → bytes
-  const bytes = base64url.decode(ucanString);
-  // console.log("Decoded bytes:", bytes);
+async function processValue(value: any, reader?: CarReader): Promise<any> {
+  // Handle CID objects - check if they reference a UCAN block
+  if (value && typeof value === "object" && value.constructor?.name === "CID") {
+    if (reader) {
+      try {
+        // Try to fetch the block from CAR reader
+        const block = await reader.get(value);
+        if (block) {
+          // Decode the UCAN block
+          const decoded = await CBOR.decode(block.bytes);
+          // Recursively process the nested UCAN
+          return await processDecodedUCAN(decoded, reader);
+        }
+      } catch (err) {
+        // If block not found, just return CID string
+        console.log("Block not found for CID:", value.toString());
+      }
+    }
+    return value.toString();
+  }
 
-  const reader = await CarReader.fromBytes(bytes);
-  // console.log("CAR Reader:", reader);
+  // Handle arrays
+  if (Array.isArray(value)) {
+    return Promise.all(value.map((v) => processValue(v, reader)));
+  }
 
-  const blocks = reader.blocks();
-  const block = await blocks.next();
-  const delegation = block.value.bytes;
-  const decodedDelegation = await Block.decoder(delegation, "dag-cbor");
-  const finalDelegation = decodedDelegation.decode();
+  // Handle plain objects
+  if (value && typeof value === "object" && value.constructor === Object) {
+    const entries = await Promise.all(
+      Object.entries(value).map(async ([k, v]) => [
+        k,
+        await processValue(v, reader),
+      ])
+    );
+    return Object.fromEntries(entries);
+  }
 
-  // Convert Uint8Array fields to readable formats
-  const processedDelegation = Object.fromEntries(
-    Object.entries(finalDelegation).map(([key, value]) => {
+  // Handle Uint8Array
+  if (value instanceof Uint8Array) {
+    // First check if it starts with CBOR DID tag (0xD8, 0x9D)
+    if (value.length > 2 && value[0] === 0xd8 && value[1] === 0x9d) {
+      try {
+        const decoded = decodeDID(value);
+        if (decoded.startsWith("did:")) {
+          return decoded;
+        }
+      } catch {
+        // Fall through to other handlers
+      }
+    }
+
+    // Try UTF-8 decode
+    try {
+      const decoded = new TextDecoder().decode(value);
+      // Check if it's printable ASCII/UTF-8
+      if (/^[\x20-\x7E\s]*$/.test(decoded)) {
+        return decoded;
+      }
+    } catch {
+      // Fall through
+    }
+
+    // Keep as hex string as last resort
+    return Buffer.from(value).toString("hex");
+  }
+
+  return value;
+}
+
+/**
+ * Process a decoded UCAN delegation object
+ */
+async function processDecodedUCAN(decodedDelegation: any, reader: CarReader) {
+  const entries = await Promise.all(
+    Object.entries(decodedDelegation).map(async ([key, value]) => {
       if (value instanceof Uint8Array) {
-        // Signature field - keep as hex string for readability
+        // Signature field - keep as hex string
         if (key === "s") {
           return [key, Buffer.from(value).toString("hex")];
         }
@@ -46,23 +105,44 @@ async function decodeEmailUCAN(ucanString) {
         // Try to decode as CBOR first for other fields
         try {
           const decoded = CBOR.decode(value);
-          return [key, decoded];
+          return [key, await processValue(decoded, reader)];
         } catch {
           // If not CBOR, try UTF-8 string
           try {
             const decoded = new TextDecoder().decode(value);
             return [key, decoded];
           } catch {
-            // Keep as Uint8Array if nothing works
             return [key, value];
           }
         }
       }
-      return [key, value];
+      // Recursively process all other values
+      return [key, await processValue(value, reader)];
     })
   );
 
-  console.log("Processed Delegation:", processedDelegation);
+  return Object.fromEntries(entries);
+}
+
+/**
+ * Decode email UCAN string into Delegation
+ */
+async function decodeEmailUCAN(ucanString: string) {
+  // Decode base64url → bytes
+  const bytes = base64url.decode(ucanString);
+
+  const reader = await CarReader.fromBytes(bytes);
+
+  const blocks = reader.blocks();
+  const block = await blocks.next();
+  const delegation = block.value.bytes;
+  const decodedDelegation = await CBOR.decode(delegation);
+
+  // Process the delegation with recursive UCAN decoding
+  const processedDelegation = await processDecodedUCAN(
+    decodedDelegation,
+    reader
+  );
 
   return processedDelegation;
 }
@@ -70,21 +150,21 @@ async function decodeEmailUCAN(ucanString) {
 /**
  * Format issuer DID
  */
-function formatIssuer(did) {
-  return did.toString();
-}
+// function formatIssuer(did) {
+//   return did.toString();
+// }
 
 /**
  * Format audience DID
  */
-function formatAudience(did) {
-  return did.toString();
-}
+// function formatAudience(did) {
+//   return did.toString();
+// }
 
 /**
  * Convert Delegation into UI-friendly object
  */
-function formatDelegationForUI(d) {
+function formatDelegationForUI(d: any) {
   return {
     issuer: d.iss || d.issuer,
     audience: d.aud || d.audience,
