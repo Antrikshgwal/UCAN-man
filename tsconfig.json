@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
-		"module": "Node16",
-		"target": "ES2022",
+		"module": "node16",
+		"target": "es2022",
 		"outDir": "out",
 		"lib": [
 			"DOM"
@@ -9,9 +9,11 @@
 		"sourceMap": true,
 		"rootDir": "src",
 		"strict": true,
-		"moduleResolution": "Node16",
+		"moduleResolution": "node16",
 		"skipLibCheck": true,
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
 	},
 	"include": [
 		"src"

@@ -4,6 +4,11 @@
  * @returns stringified DID
  */
 
+import { bytes } from "@ucanto/core/schema";
+import { CarReader } from "@ipld/car";
+import { CAR } from "@ucanto/core";
+import { base64url } from "multiformats/bases/base64";
+
 export function decodeDID(bytes: Uint8Array) {
   if (!(bytes instanceof Uint8Array)) {
     return bytes;
@@ -24,3 +29,10 @@ export function decodeDID(bytes: Uint8Array) {
   }
 }
 
+export function FindUCAN(cid: string, carFile: Uint8Array): Uint8Array | null {
+  const bytes = base64url.decode(cid);
+  const reader = await CarReader.fromBytes(carFile);
+
+  const block = await reader.get(CAR.codec.decode(bytes));
+  return block ? block.bytes : null;
+}
