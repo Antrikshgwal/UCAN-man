@@ -5,9 +5,10 @@
  */
 
 import { bytes } from "@ucanto/core/schema";
-import { CarReader } from "@ipld/car";
+import { CarReader } from "@ipld/car/reader";
 import { CAR } from "@ucanto/core";
 import { base64url } from "multiformats/bases/base64";
+import { CID } from "multiformats";
 
 export function decodeDID(bytes: Uint8Array) {
   if (!(bytes instanceof Uint8Array)) {
@@ -28,11 +29,19 @@ export function decodeDID(bytes: Uint8Array) {
     return bytes;
   }
 }
+// /**
+//  * Find UCAN block by CID in CAR file
+//  */
 
-export function FindUCAN(cid: string, carFile: Uint8Array): Uint8Array | null {
-  const bytes = base64url.decode(cid);
-  const reader = await CarReader.fromBytes(carFile);
+// export async function FindUCAN(
+//   cid: string,
+//   carFile: Uint8Array,
+// ): Promise<Uint8Array | null> {
+//   const bytes = base64url.decode(cid);
 
-  const block = await reader.get(CAR.codec.decode(bytes));
-  return block ? block.bytes : null;
-}
+
+//   const reader = await CarReader.fromBytes(carFile);
+
+//   const block = await reader.CAR.get(cidObj);
+//   return block ? block.bytes : null;
+// }
