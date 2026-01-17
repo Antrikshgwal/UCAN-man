@@ -1,25 +1,28 @@
 {
 	"compilerOptions": {
-		"module": "node16",
-		"target": "es2022",
+		"module": "ESNext",
+		"target": "ES2022",
 		"outDir": "out",
 		"lib": [
-			"DOM"
+			"DOM",
+			"ES2022"
 		],
 		"sourceMap": true,
 		"rootDir": "src",
 		"strict": true,
-		"moduleResolution": "node16",
+		"moduleResolution": "bundler",
 		"skipLibCheck": true,
 		"esModuleInterop": true,
 		"allowImportingTsExtensions": true,
 		"noEmit": true,
+		"resolveJsonModule": true
 	},
 	"include": [
 		"src"
 	],
 	"exclude": [
 		"node_modules",
-		".vscode-test"
+		".vscode-test",
+		"**/*.test.*"
 	]
 }
