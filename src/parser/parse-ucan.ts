@@ -6,7 +6,9 @@ import type { UCAN } from "../shared/types.ts";
 async function resolveValue(value: any, reader: CarReader): Promise<any> {
   if (value?.constructor?.name === "CID") {
     const block = await reader.get(value);
-    if (!block) return value;
+    if (!block) {
+      return value;
+    }
 
     try {
       const decoded = CBOR.decode(block.bytes);
@@ -23,7 +25,8 @@ async function resolveValue(value: any, reader: CarReader): Promise<any> {
     return Promise.all(value.map((v) => resolveValue(v, reader)));
   }
 
-  if (value && typeof value === "object" && value.constructor === Object) {
+  // Handle plain objects (but not special objects like Uint8Array, Date, etc.)
+  if (value && typeof value === "object" && !ArrayBuffer.isView(value)) {
     const entries = await Promise.all(
       Object.entries(value).map(async ([k, v]) => [
         k,

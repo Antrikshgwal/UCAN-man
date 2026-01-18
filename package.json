@@ -54,6 +54,7 @@
   "dependencies": {
     "@ipld/block": "^6.0.4",
     "@ipld/car": "^5.4.2",
+    "@ipld/dag-cbor": "^9.2.5",
     "@ucanto/core": "^10.4.6",
     "@ucanto/interface": "^11.0.1",
     "cborg": "^4.3.1",

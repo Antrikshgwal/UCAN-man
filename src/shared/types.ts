@@ -15,3 +15,14 @@ export interface UCAN {
   prf?: CID[];
   s?: Uint8Array;
 }
+
+export interface AnalyzedCAR {
+  blocks: Map<string, Uint8Array>;
+  ucans: ParsedUCAN[];
+}
+
+export interface ParsedUCAN {
+  cid: CID;
+  ucan: UCAN;
+  raw: Uint8Array;
+}
