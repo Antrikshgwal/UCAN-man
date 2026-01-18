@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { CarInput } from "../adapters/car-adapter";
+import { PayloadInput } from "../adapters/response-payload-adapter";
 import { serializeUCANForDisplay } from "../shared/utils";
 import type { UCAN } from "../shared/types";
 
@@ -65,6 +66,44 @@ export function activate(context: vscode.ExtensionContext) {
                     type: "error",
                     message:
                       error instanceof Error ? error.message : String(error),
+                  });
+                }
+                break;
+
+              case "decodePayload":
+                try {
+                  // Process the payload
+                  const result = await PayloadInput(message.data);
+
+                  // Serialize all UCANs for display
+                  const serializedUCANs = result.ucans.map((ucan) =>
+                    serializeUCANForDisplay(ucan),
+                  );
+
+                  // Send the result back to the webview with UCAN count
+                  currentPanel?.webview.postMessage({
+                    type: "decoded",
+                    data: serializedUCANs,
+                    totalUCANs: result.totalUCANs,
+                  });
+                } catch (error) {
+                  let errorMsg =
+                    error instanceof Error ? error.message : String(error);
+
+                  // Provide helpful context for common errors
+                  if (errorMsg.includes("Invalid CID")) {
+                    errorMsg +=
+                      "\n\n💡 Tip: Make sure you're copying the raw request body. Try:\n" +
+                      "1. Open browser DevTools (F12)\n" +
+                      "2. Go to Network tab\n" +
+                      "3. Find the request\n" +
+                      "4. Click 'Payload' or 'Request' tab\n" +
+                      "5. Copy the raw binary data (not the pretty-printed version)";
+                  }
+
+                  currentPanel?.webview.postMessage({
+                    type: "error",
+                    message: errorMsg,
                   });
                 }
                 break;
@@ -139,11 +178,19 @@ function getWebViewContent() {
     <div>
         <h2>UCAN Decoder</h2>
         <div class="input-section">
-            <h3>Upload CAR file</h3>
+            <h3>Option 1: Upload CAR file</h3>
             <input type="file" id="fileInput" accept=".car" />
-            <button id="decodeButton">Decode UCAN</button>
+            <button id="decodeButton">Decode CAR File</button>
         </div>
-        <div id="output">No file loaded. Please select a .car file and click Decode UCAN.</div>
+        <div class="input-section">
+            <h3>Option 2: Paste Request Payload</h3>
+            <textarea id="payloadInput" placeholder="Paste HTTP request payload here (supports base64, hex, or raw binary)..." style="width: 100%; min-height: 100px; font-family: monospace;"></textarea>
+            <button id="decodePayloadButton">Decode Payload</button>
+            <p style="font-size: 0.9em; color: var(--vscode-descriptionForeground); margin-top: 5px;">
+                💡 Tip: Copy raw request body from browser DevTools (Network tab → Request → Raw)
+            </p>
+        </div>
+        <div id="output">Upload a .car file or paste a request payload above.</div>
     </div>
 
     <script>
@@ -181,6 +228,26 @@ function getWebViewContent() {
                 output.className = 'error';
                 output.innerText = '❌ Error reading file: ' + error.message;
             }
+        });
+
+        document.getElementById('decodePayloadButton').addEventListener('click', () => {
+            const payloadInput = document.getElementById('payloadInput');
+            const output = document.getElementById('output');
+
+            if (!payloadInput.value.trim()) {
+                output.className = 'error';
+                output.innerText = '❌ Please paste a request payload first';
+                return;
+            }
+
+            output.innerText = '⏳ Processing payload...';
+            output.className = '';
+
+            // Send payload to extension for processing
+            vscode.postMessage({
+                type: 'decodePayload',
+                data: payloadInput.value
+            });
         });
 
         // Listen for messages from the extension
