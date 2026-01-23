@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { CarInput } from "../adapters/car-adapter";
-import { PayloadInput } from "../adapters/response-payload-adapter";
+import { RequestPayloadInput } from "../adapters/request-payload-adapter";
 import { serializeUCANForDisplay } from "../shared/utils";
 import type { UCAN } from "../shared/types";
 
@@ -72,33 +72,38 @@ export function activate(context: vscode.ExtensionContext) {
 
               case "decodePayload":
                 try {
-                  // Process the payload
-                  const result = await PayloadInput(message.data);
+                  // Process the payload using the new RequestPayloadInput
+                  const result = await RequestPayloadInput(message.data);
 
                   // Serialize all UCANs for display
                   const serializedUCANs = result.ucans.map((ucan) =>
                     serializeUCANForDisplay(ucan),
                   );
 
-                  // Send the result back to the webview with UCAN count
+                  // Send the result back to the webview with UCAN count and metadata
                   currentPanel?.webview.postMessage({
                     type: "decoded",
                     data: serializedUCANs,
                     totalUCANs: result.totalUCANs,
+                    invocations: result.invocations,
+                    metadata: result.metadata,
                   });
                 } catch (error) {
                   let errorMsg =
                     error instanceof Error ? error.message : String(error);
 
                   // Provide helpful context for common errors
-                  if (errorMsg.includes("Invalid CID")) {
+                  if (
+                    errorMsg.includes("Invalid") ||
+                    errorMsg.includes("Unable to extract")
+                  ) {
                     errorMsg +=
                       "\n\n💡 Tip: Make sure you're copying the raw request body. Try:\n" +
                       "1. Open browser DevTools (F12)\n" +
                       "2. Go to Network tab\n" +
                       "3. Find the request\n" +
                       "4. Click 'Payload' or 'Request' tab\n" +
-                      "5. Copy the raw binary data (not the pretty-printed version)";
+                      "5. Copy the raw data (base64, hex, or JSON format)";
                   }
 
                   currentPanel?.webview.postMessage({
@@ -172,6 +177,19 @@ function getWebViewContent() {
         .success {
             color: var(--vscode-charts-green);
         }
+        .metadata {
+            background: var(--vscode-editor-inactiveSelectionBackground);
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        .section-header {
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            color: var(--vscode-textLink-foreground);
+        }
     </style>
 </head>
 <body>
@@ -184,10 +202,16 @@ function getWebViewContent() {
         </div>
         <div class="input-section">
             <h3>Option 2: Paste Request Payload</h3>
-            <textarea id="payloadInput" placeholder="Paste HTTP request payload here (supports base64, hex, or raw binary)..." style="width: 100%; min-height: 100px; font-family: monospace;"></textarea>
+            <textarea id="payloadInput" placeholder="Paste HTTP request payload here...
+
+Supported formats:
+• CAR file (base64/base64url encoded)
+• CBOR data (base64/base64url/hex encoded)
+• JSON with UCAN/invocation fields
+• Raw binary data" style="width: 100%; min-height: 120px; font-family: monospace;"></textarea>
             <button id="decodePayloadButton">Decode Payload</button>
             <p style="font-size: 0.9em; color: var(--vscode-descriptionForeground); margin-top: 5px;">
-                💡 Tip: Copy raw request body from browser DevTools (Network tab → Request → Raw)
+                💡 Tip: Copy raw request body from browser DevTools (Network tab → Payload/Request → Raw/View source)
             </p>
         </div>
         <div id="output">Upload a .car file or paste a request payload above.</div>
@@ -258,12 +282,36 @@ function getWebViewContent() {
             switch (message.type) {
                 case 'decoded':
                     output.className = 'success';
-                    // Display UCAN count before the JSON
-                    const countInfo = message.totalUCANs
-                        ? \`Found \${message.totalUCANs} UCAN\${message.totalUCANs > 1 ? 's' : ''} in CAR file\\n\\n\`
-                        : '';
-                    // Display all UCANs with separators
-                    let displayText = countInfo;
+
+                    let displayText = '';
+
+                    // Display metadata if present
+                    if (message.metadata) {
+                        displayText += \`📋 Format: \${message.metadata.format.toUpperCase()}\\n\`;
+                        if (message.metadata.hasInvocations) {
+                            displayText += \`✅ Contains invocation data\\n\`;
+                        }
+                        displayText += '\\n';
+                    }
+
+                    // Display UCAN count
+                    if (message.totalUCANs) {
+                        displayText += \`🔑 Found \${message.totalUCANs} UCAN\${message.totalUCANs > 1 ? 's' : ''}\\n\\n\`;
+                    }
+
+                    // Display invocations if present
+                    if (message.invocations && message.invocations.length > 0) {
+                        displayText += '=== INVOCATIONS ===\\n\\n';
+                        message.invocations.forEach((inv, index) => {
+                            if (index > 0) displayText += '\\n\\n--- Invocation ' + (index + 1) + ' ---\\n\\n';
+                            else displayText += '--- Invocation 1 ---\\n\\n';
+                            displayText += JSON.stringify(inv, null, 2);
+                        });
+                        displayText += '\\n\\n';
+                    }
+
+                    // Display UCANs
+                    displayText += '=== UCANs ===\\n\\n';
                     if (Array.isArray(message.data)) {
                         message.data.forEach((ucan, index) => {
                             if (index > 0) displayText += '\\n\\n--- UCAN ' + (index + 1) + ' ---\\n\\n';
@@ -273,6 +321,7 @@ function getWebViewContent() {
                     } else {
                         displayText += JSON.stringify(message.data, null, 2);
                     }
+
                     output.innerText = displayText;
                     break;
                 case 'error':

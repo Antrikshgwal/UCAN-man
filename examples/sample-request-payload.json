@@ -1,0 +1,58 @@
+{
+  "invocation": {
+    "task": "store/add",
+    "capabilities": ["store/add", "store/list"],
+    "params": {
+      "link": "bafy2bzacedai6bx6g7qp3x6bj3aiqbh4xzxqx6z4p2qj4v2q5r3s4t5u6v7w",
+      "size": 1024
+    },
+    "ucan": {
+      "v": "0.10.0",
+      "iss": {
+        "0": 100,
+        "1": 105,
+        "2": 100,
+        "3": 58,
+        "4": 107,
+        "5": 101,
+        "6": 121,
+        "7": 58,
+        "8": 122,
+        "9": 54,
+        "10": 77,
+        "11": 107
+      },
+      "aud": {
+        "0": 100,
+        "1": 105,
+        "2": 100,
+        "3": 58,
+        "4": 107,
+        "5": 101,
+        "6": 121,
+        "7": 58,
+        "8": 122,
+        "9": 54,
+        "10": 77,
+        "11": 107
+      },
+      "att": [
+        {
+          "can": "store/add",
+          "with": "did:key:z6MkkZDjunoN4gyPMx5TSy7Mfzw22D2RZQZUcx46bii53Ex2"
+        },
+        {
+          "can": "store/list",
+          "with": "did:key:z6MkkZDjunoN4gyPMx5TSy7Mfzw22D2RZQZUcx46bii53Ex2"
+        }
+      ],
+      "exp": 1735689600,
+      "nbf": 1704067200
+    }
+  },
+  "metadata": {
+    "timestamp": "2025-01-23T10:30:00Z",
+    "client": "web-browser",
+    "version": "1.0.0"
+  }
+}
