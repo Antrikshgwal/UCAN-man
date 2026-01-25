@@ -1,30 +1,30 @@
 import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
-import { CarInput } from "../adapters/car-adapter"; // adjust path if needed
-import { serializeUCANForDisplay } from "../shared/utils"; // add this
-import type { UCAN } from "../shared/types"; // adjust path if needed
+import { CarInput } from "../adapters/car-adapter";
+import { serializeUCANForDisplay } from "../shared/utils";
+import type { UCAN } from "../shared/types";
 
 describe("CAR input pipeline", () => {
   it("extracts a valid UCAN from a .car file", async () => {
-    // Arrange: load real CAR file
+    // load real CAR file
     const carPath = path.join(__dirname, "./", "test-request.car");
 
     const carBytes = fs.readFileSync(carPath);
 
-    // Act: run CAR input pipeline
+    // Process CAR input
     const result = await CarInput(new Uint8Array(carBytes));
     const ucan: UCAN = result.ucans[0];
 
     console.log("Parsed UCAN:", ucan);
     console.log("\nTotal UCANs found:", result.totalUCANs);
 
-    // Serialize for display (like the UI does)
+    // Serialize
     const serialized = serializeUCANForDisplay(ucan);
     console.log("\nSerialized UCAN for UI:");
     console.log(JSON.stringify(serialized, null, 2));
 
-    // Assert: minimal UCAN invariants
+
     expect(ucan).toBeDefined();
 
     expect(ucan.iss).toBeDefined();
