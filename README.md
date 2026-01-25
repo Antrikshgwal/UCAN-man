@@ -193,7 +193,6 @@ When present, invocations show:
 ## 📚 Resources
 
 - **UCAN Specification**: [https://github.com/ucan-wg/spec](https://github.com/ucan-wg/spec)
-- **Request Payload Documentation**: See [docs/REQUEST_PAYLOAD.md](docs/REQUEST_PAYLOAD.md)
 - **Architecture Documentation**: See [docs/ARCHITECTURE_DIAGRAM.md](docs/ARCHITECTURE_DIAGRAM.md)
 
 ---
