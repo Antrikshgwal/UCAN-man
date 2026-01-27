@@ -19,7 +19,7 @@
 	},
 	"include": [
 		"src"
-	],
+, "src/extension/main.ts"	],
 	"exclude": [
 		"node_modules",
 		".vscode-test",

@@ -2,14 +2,33 @@
   "name": "ucan-man",
   "displayName": "UCAN-man",
   "description": "VS code extension for debugging UCAN requests",
+  "publisher": "AntrikshGwal",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.80.0"
+    "vscode": "^1.106.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Antrikshgwal/UCAN-man.git"
   },
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "ucan",
+    "ucanto",
+    "authentication",
+    "authorization",
+    "debug",
+    "inspector",
+    "jwt",
+    "ipld",
+    "car",
+    "dag-cbor",
+    "web3"
+  ],
   "type": "module",
+  "icon": "macaw.ico",
   "main": "./out/main.cjs",
   "contributes": {
     "commands": [
@@ -57,6 +76,7 @@
     "@ipld/dag-cbor": "^9.2.5",
     "@ucanto/core": "^10.4.6",
     "@ucanto/interface": "^11.0.1",
+    "@vscode/vsce": "^3.7.1",
     "cborg": "^4.3.1",
     "multiformats": "^13.4.2",
     "uint8arrays": "^5.1.0"

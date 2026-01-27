@@ -2,7 +2,6 @@ import * as vscode from "vscode";
 import { CarInput } from "../adapters/car-adapter";
 import { RequestPayloadInput } from "../adapters/request-payload-adapter";
 import { serializeUCANForDisplay } from "../shared/utils";
-import type { UCAN } from "../shared/types";
 
 export function activate(context: vscode.ExtensionContext) {
   const time = new Date().toLocaleTimeString();
@@ -12,8 +11,6 @@ export function activate(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
     "ucanman.decodeUcan",
     () => {
-      vscode.window.showInformationMessage(`UCAN Inspector opened! ${time}`);
-
       const columnToShowIn = vscode.window.activeTextEditor
         ? vscode.window.activeTextEditor.viewColumn
         : undefined;
